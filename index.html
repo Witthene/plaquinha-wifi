@@ -403,20 +403,26 @@ function flor(x, y, r, cor, miolo) {
 }
 const tema = (nome, t) => ({ nome, w: 1240, h: 1748, draw(d, W, H) {
   ctx.textAlign = 'center'; t.fundo(W, H);
-  if (logoImg && !d.logoQR) logoOuIcone(d, W / 2, 210, 150);
-  else { ctx.fillStyle = t.cor; ctx.beginPath(); ctx.arc(W / 2, 210, 95, 0, Math.PI * 2); ctx.fill(); icone(t.icone, W / 2, 210, 110, t.corIcone || '#fff'); }
-  texto(t.titulo || d.titulo, W / 2, 420, W - 220, 110, 800, t.tTitulo, t.fonte);
-  texto(t.frase || d.nome, W / 2, 495, W - 240, 46, 600, t.tFrase, t.fonte);
-  const s = 580, qy = 570;
+  if (logoImg && !d.logoQR) logoOuIcone(d, W / 2, 190, 150);
+  else {
+    ctx.fillStyle = t.cor; ctx.beginPath(); ctx.arc(W / 2, 185, 82, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = t.cor; ctx.globalAlpha = 0.3; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(W / 2, 185, 100, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1;
+    icone(t.icone, W / 2, 185, 96, t.corIcone || '#fff');
+  }
+  ctx.letterSpacing = '8px'; texto(d.nome.toUpperCase(), W / 2, 335, W - 260, 38, 700, t.tFrase); ctx.letterSpacing = '0px';
+  texto(t.titulo || d.titulo, W / 2, 445, W - 220, 110, 800, t.tTitulo, t.fonte);
+  if (t.frase) texto(t.frase, W / 2, 510, W - 240, 40, 'italic 500', t.tFrase, t.fonte);
+  const s = 580, qy = 590;
   ctx.save(); ctx.shadowColor = 'rgba(0,0,0,0.22)'; ctx.shadowBlur = 36; ctx.shadowOffsetY = 10;
   ctx.fillStyle = '#fff'; rr((W - s) / 2 - 40, qy - 40, s + 80, s + 80, t.raio); ctx.fill(); ctx.restore();
   ctx.strokeStyle = t.cor; ctx.lineWidth = 8; rr((W - s) / 2 - 40, qy - 40, s + 80, s + 80, t.raio); ctx.stroke();
   qrDesenho(d, (W - s) / 2, qy, s);
-  const y = qy + s + 80;
+  selo({ ...d, cor: t.cor }, W / 2, qy + s + 40, 0.8);
+  const y = qy + s + 105;
   caixaInfo(150, y, W - 300, 'Rede', d.ssid, P.wifi, t.cor, t.caixa, t.tRot, t.tVal);
   if (d.mostra) caixaInfo(150, y + 170, W - 300, 'Senha', d.senha, P.lock, t.cor, t.caixa, t.tRot, t.tVal);
   if (t.extra) t.extra(W, H);
-  texto(t.titulo ? d.nome : d.rodape, W / 2, H - 70, W - 260, 38, 600, t.tRod, t.fonte);
+  texto(d.rodape, W / 2, H - 70, W - 260, 38, 600, t.tRod, t.fonte);
 }});
 Object.assign(MODELOS, {
   fazenda: tema('Fazenda', { cor: '#4d7c2a', icone: PT.folha, fonte: SERIF, raio: 20,
@@ -431,7 +437,7 @@ Object.assign(MODELOS, {
       ctx.strokeStyle = '#a0703f'; ctx.lineWidth = 6; ctx.strokeRect(40, 40, W - 80, H - 80);
     } }),
   roupa: tema('Loja de Roupa', { cor: '#b76e79', icone: PT.roupa, fonte: SERIF, raio: 6,
-    tTitulo: '#2b2b2b', tFrase: '#b76e79', caixa: '#fff', tRot: '#b76e79', tVal: '#222', tRod: '#8a7f7a',
+    frase: 'Estilo e conexão pra você', tTitulo: '#2b2b2b', tFrase: '#b76e79', caixa: '#fff', tRot: '#b76e79', tVal: '#222', tRod: '#8a7f7a',
     fundo(W, H) {
       ctx.fillStyle = '#f7f1ec'; ctx.fillRect(0, 0, W, H);
       ctx.strokeStyle = '#b76e79'; ctx.lineWidth = 3; ctx.strokeRect(50, 50, W - 100, H - 100); ctx.lineWidth = 1.5; ctx.strokeRect(66, 66, W - 132, H - 132);
@@ -458,14 +464,15 @@ Object.assign(MODELOS, {
         for (let x = 0; x < W; x += 80) ctx.fillRect(x, y0, 40, h);
         for (let y = y0; y < y0 + h; y += 80) ctx.fillRect(0, y, W, 40); };
       xadrez(0, 80); xadrez(H - 140, 140);
+      ctx.fillStyle = '#b91c1c'; ctx.fillRect(0, H - 122, W, 84);
     } }),
   cafe: tema('Café / Padaria', { cor: '#6f4e37', icone: PT.cafe, fonte: SERIF, raio: 40,
     tTitulo: '#4b3425', tFrase: '#a0522d', caixa: '#f3e6d6', tRot: '#8b5e3c', tVal: '#3b2a1e', tRod: '#f3e6d6',
     frase: 'Um cafezinho e uma conexão',
     fundo(W, H) {
       ctx.fillStyle = '#fbf5ec'; ctx.fillRect(0, 0, W, H);
-      ctx.fillStyle = 'rgba(111,78,55,0.08)';
-      for (let i = 0; i < 14; i++) { const x = (i * 337) % W, y = (i * 523) % H; ctx.beginPath(); ctx.ellipse(x, y, 26, 38, i, 0, Math.PI * 2); ctx.fill(); }
+      ctx.strokeStyle = '#6f4e37'; ctx.lineWidth = 4; rr(44, 44, W - 88, H - 220, 40); ctx.stroke();
+      ctx.lineWidth = 2; rr(60, 60, W - 120, H - 252, 30); ctx.stroke();
       ctx.fillStyle = '#6f4e37'; ctx.fillRect(0, H - 130, W, 130);
     } }),
   salao: tema('Barbearia / Salão', { cor: '#111', icone: PT.tesoura, raio: 0,
