@@ -386,6 +386,114 @@ const MODELOS = {
     } else texto(d.ssid, W / 2, s + 80, W - 30, 44, 800, '#000');
   }}
 };
+// ---------- modelos temáticos por tipo de comércio (cores próprias, ignoram a cor escolhida) ----------
+const PT = {
+  roupa: 'M21.6 18.2L13 11.75v-.91c1.65-.49 2.8-2.17 2.43-4.05-.26-1.31-1.3-2.4-2.61-2.7C10.54 3.57 8.5 5.3 8.5 7.5h2c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5c0 .84-.69 1.52-1.53 1.5-.54-.01-.97.45-.97.99v1.76L2.4 18.2c-.77.58-.36 1.8.6 1.8h18c.96 0 1.37-1.22.6-1.8zM6 18l6-4.5 6 4.5H6z',
+  folha: 'M6.05 8.05c-2.73 2.73-2.73 7.15-.02 9.88 1.47-3.4 4.09-6.24 7.37-7.93-2.78 2.34-4.73 5.61-5.39 9.32 2.6 1.23 5.8.78 7.95-1.37C19.43 14.47 20 4 20 4S9.53 4.57 6.05 8.05z',
+  talher: 'M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z',
+  cafe: 'M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z',
+  tesoura: 'M9.64 7.64c.23-.5.36-1.05.36-1.64 0-2.21-1.79-4-4-4S2 3.79 2 6s1.79 4 4 4c.59 0 1.14-.13 1.64-.36L10 12l-2.36 2.36C7.14 14.13 6.59 14 6 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4c0-.59-.13-1.14-.36-1.64L12 14l7 7h3v-1L9.64 7.64zM6 8c-1.1 0-2-.89-2-2s.9-2 2-2 2 .89 2 2-.9 2-2 2zm0 12c-1.1 0-2-.89-2-2s.9-2 2-2 2 .89 2 2-.9 2-2 2zM19 3l-6 6 2 2 7-7V3z',
+  coracao: 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'
+};
+const SERIF = '"Playfair Display", Georgia, serif';
+function flor(x, y, r, cor, miolo) {
+  ctx.fillStyle = cor;
+  for (let i = 0; i < 5; i++) { const a = i * Math.PI * 2 / 5; ctx.beginPath(); ctx.arc(x + Math.cos(a) * r, y + Math.sin(a) * r, r * 0.8, 0, Math.PI * 2); ctx.fill(); }
+  ctx.fillStyle = miolo; ctx.beginPath(); ctx.arc(x, y, r * 0.6, 0, Math.PI * 2); ctx.fill();
+}
+const tema = (nome, t) => ({ nome, w: 1240, h: 1748, draw(d, W, H) {
+  ctx.textAlign = 'center'; t.fundo(W, H);
+  if (logoImg && !d.logoQR) logoOuIcone(d, W / 2, 210, 150);
+  else { ctx.fillStyle = t.cor; ctx.beginPath(); ctx.arc(W / 2, 210, 95, 0, Math.PI * 2); ctx.fill(); icone(t.icone, W / 2, 210, 110, t.corIcone || '#fff'); }
+  texto(t.titulo || d.titulo, W / 2, 420, W - 220, 110, 800, t.tTitulo, t.fonte);
+  texto(t.frase || d.nome, W / 2, 495, W - 240, 46, 600, t.tFrase, t.fonte);
+  const s = 580, qy = 570;
+  ctx.save(); ctx.shadowColor = 'rgba(0,0,0,0.22)'; ctx.shadowBlur = 36; ctx.shadowOffsetY = 10;
+  ctx.fillStyle = '#fff'; rr((W - s) / 2 - 40, qy - 40, s + 80, s + 80, t.raio); ctx.fill(); ctx.restore();
+  ctx.strokeStyle = t.cor; ctx.lineWidth = 8; rr((W - s) / 2 - 40, qy - 40, s + 80, s + 80, t.raio); ctx.stroke();
+  qrDesenho(d, (W - s) / 2, qy, s);
+  const y = qy + s + 80;
+  caixaInfo(150, y, W - 300, 'Rede', d.ssid, P.wifi, t.cor, t.caixa, t.tRot, t.tVal);
+  if (d.mostra) caixaInfo(150, y + 170, W - 300, 'Senha', d.senha, P.lock, t.cor, t.caixa, t.tRot, t.tVal);
+  if (t.extra) t.extra(W, H);
+  texto(t.titulo ? d.nome : d.rodape, W / 2, H - 70, W - 260, 38, 600, t.tRod, t.fonte);
+}});
+Object.assign(MODELOS, {
+  fazenda: tema('Fazenda', { cor: '#4d7c2a', icone: PT.folha, fonte: SERIF, raio: 20,
+    tTitulo: '#4a2f17', tFrase: '#6b4a2b', caixa: '#f6ecd6', tRot: '#8a6a45', tVal: '#3a2512', tRod: '#fff',
+    frase: 'Bem-vindo à roça, fique à vontade',
+    fundo(W, H) {
+      const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#cfe8f5'); g.addColorStop(0.5, '#fbf3e0'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = '#f7c948'; ctx.beginPath(); ctx.arc(W - 170, 170, 90, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#8bbf5a'; ctx.beginPath(); ctx.moveTo(0, H - 260); ctx.bezierCurveTo(W * 0.3, H - 380, W * 0.6, H - 160, W, H - 300); ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.fill();
+      ctx.fillStyle = '#5e9a36'; ctx.beginPath(); ctx.moveTo(0, H - 150); ctx.bezierCurveTo(W * 0.4, H - 260, W * 0.7, H - 90, W, H - 180); ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.fill();
+      ctx.strokeStyle = '#7a4f2a'; ctx.lineWidth = 34; ctx.strokeRect(17, 17, W - 34, H - 34);
+      ctx.strokeStyle = '#a0703f'; ctx.lineWidth = 6; ctx.strokeRect(40, 40, W - 80, H - 80);
+    } }),
+  roupa: tema('Loja de Roupa', { cor: '#b76e79', icone: PT.roupa, fonte: SERIF, raio: 6,
+    tTitulo: '#2b2b2b', tFrase: '#b76e79', caixa: '#fff', tRot: '#b76e79', tVal: '#222', tRod: '#8a7f7a',
+    fundo(W, H) {
+      ctx.fillStyle = '#f7f1ec'; ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = '#b76e79'; ctx.lineWidth = 3; ctx.strokeRect(50, 50, W - 100, H - 100); ctx.lineWidth = 1.5; ctx.strokeRect(66, 66, W - 132, H - 132);
+      ctx.fillStyle = 'rgba(183,110,121,0.10)'; ctx.beginPath(); ctx.arc(0, 0, 380, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(W, H, 380, 0, Math.PI * 2); ctx.fill();
+    } }),
+  celular: tema('Loja de Celular', { cor: '#0ea5e9', icone: P.phone, raio: 28,
+    tTitulo: '#fff', tFrase: '#22d3ee', caixa: '#162033', tRot: '#7dd3fc', tVal: '#fff', tRod: '#7dd3fc',
+    frase: 'Conecte, teste e aproveite',
+    fundo(W, H) {
+      ctx.fillStyle = '#0b1120'; ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = 'rgba(34,211,238,0.08)'; ctx.lineWidth = 2;
+      for (let x = 0; x < W; x += 62) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+      for (let y = 0; y < H; y += 62) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+      const g = ctx.createRadialGradient(W / 2, 860, 50, W / 2, 860, 700); g.addColorStop(0, 'rgba(14,165,233,0.35)'); g.addColorStop(1, 'rgba(14,165,233,0)');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 6; rr(40, 40, W - 80, H - 80, 60); ctx.stroke();
+    } }),
+  restaurante: tema('Restaurante', { cor: '#b91c1c', icone: PT.talher, raio: 24,
+    tTitulo: '#7f1d1d', tFrase: '#9a3412', caixa: '#fff', tRot: '#b91c1c', tVal: '#222', tRod: '#fff',
+    frase: 'Bom apetite e boa navegação',
+    fundo(W, H) {
+      ctx.fillStyle = '#fff8ee'; ctx.fillRect(0, 0, W, H);
+      const xadrez = (y0, h) => { ctx.fillStyle = '#fff'; ctx.fillRect(0, y0, W, h); ctx.fillStyle = 'rgba(185,28,28,0.55)';
+        for (let x = 0; x < W; x += 80) ctx.fillRect(x, y0, 40, h);
+        for (let y = y0; y < y0 + h; y += 80) ctx.fillRect(0, y, W, 40); };
+      xadrez(0, 80); xadrez(H - 140, 140);
+    } }),
+  cafe: tema('Café / Padaria', { cor: '#6f4e37', icone: PT.cafe, fonte: SERIF, raio: 40,
+    tTitulo: '#4b3425', tFrase: '#a0522d', caixa: '#f3e6d6', tRot: '#8b5e3c', tVal: '#3b2a1e', tRod: '#f3e6d6',
+    frase: 'Um cafezinho e uma conexão',
+    fundo(W, H) {
+      ctx.fillStyle = '#fbf5ec'; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = 'rgba(111,78,55,0.08)';
+      for (let i = 0; i < 14; i++) { const x = (i * 337) % W, y = (i * 523) % H; ctx.beginPath(); ctx.ellipse(x, y, 26, 38, i, 0, Math.PI * 2); ctx.fill(); }
+      ctx.fillStyle = '#6f4e37'; ctx.fillRect(0, H - 130, W, 130);
+    } }),
+  salao: tema('Barbearia / Salão', { cor: '#111', icone: PT.tesoura, raio: 0,
+    tTitulo: '#111', tFrase: '#b91c1c', caixa: '#f1f1f1', tRot: '#666', tVal: '#111', tRod: '#fff',
+    frase: 'Relaxa que o Wi-Fi é por nossa conta',
+    fundo(W, H) {
+      ctx.fillStyle = '#fafafa'; ctx.fillRect(0, 0, W, H);
+      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, 50, H); ctx.rect(W - 50, 0, 50, H); ctx.clip();
+      const cores = ['#c1121f', '#fff', '#1d4ed8', '#fff'];
+      for (let y = -W, i = 0; y < H + W; y += 40, i++) { ctx.fillStyle = cores[i % 4]; ctx.beginPath();
+        ctx.moveTo(0, y); ctx.lineTo(W, y - W * 0.6); ctx.lineTo(W, y - W * 0.6 + 40); ctx.lineTo(0, y + 40); ctx.fill(); }
+      ctx.restore(); ctx.fillStyle = '#111'; ctx.fillRect(50, H - 130, W - 100, 130);
+    } }),
+  vo: tema('Casa da Vó', { cor: '#e07a9a', icone: PT.coracao, fonte: SERIF, raio: 50,
+    titulo: 'Wi-Fi da Vó', frase: 'Já comeu? Então conecta aí, meu bem',
+    tTitulo: '#7a3b52', tFrase: '#a0617a', caixa: '#fff', tRot: '#c0607f', tVal: '#5a2d3d', tRod: '#7a3b52',
+    fundo(W, H) {
+      ctx.fillStyle = '#fff6e5'; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = 'rgba(224,122,154,0.12)';
+      for (let x = 0; x < W; x += 70) for (let y = 0; y < H; y += 70) { ctx.beginPath(); ctx.arc(x + ((y / 70) % 2) * 35, y, 8, 0, Math.PI * 2); ctx.fill(); }
+      ctx.strokeStyle = '#e07a9a'; ctx.lineWidth = 5; ctx.setLineDash([18, 12]); rr(45, 45, W - 90, H - 90, 60); ctx.stroke(); ctx.setLineDash([]);
+    },
+    extra(W, H) {
+      [[110, 110, 34], [W - 110, 110, 34], [110, H - 110, 34], [W - 110, H - 110, 34], [210, 180, 20], [W - 210, 180, 20]]
+        .forEach(([x, y, r], i) => flor(x, y, r, i % 2 ? '#f6b8c8' : '#a7c7e7', '#f7d36b'));
+    } })
+});
+
 // versões em folha A4 inteira (300 dpi): o mesmo desenho ampliado 2x
 const A4 = (nome, base, w, h) => ({ nome, w, h, draw(d) {
   ctx.save(); ctx.scale(2, 2); MODELOS[base].draw(d, w / 2, h / 2); ctx.restore();
