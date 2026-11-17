@@ -340,6 +340,47 @@ const MODELOS = {
     const info = d.mostra ? d.ssid + '  •  ' + d.senha : d.ssid;
     ctx.fillStyle = d.cor; rr(140, 990, W - 280, 110, 55); ctx.fill();
     texto(info, W / 2, 1062, W - 360, 52, 700, '#fff');
+  }},
+
+  // plaquinha genérica pra levar pronta: o QR entra depois como etiqueta colada no quadrado
+  base: { nome: 'Base', w: 1240, h: 1748, draw(d, W, H) {
+    const g = degrade(d, 0, 0, W, 460);
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(W, 0); ctx.lineTo(W, 400);
+    ctx.bezierCurveTo(W * 0.7, 500, W * 0.3, 360, 0, 450); ctx.closePath(); ctx.fill();
+    ctx.textAlign = 'center';
+    logoOuIcone({ ...d, logoQR: false }, W / 2, 145, 160, '#fff');
+    texto(d.titulo, W / 2, 330, W - 160, 112, 800, '#fff');
+    const s = 650, qx = (W - s) / 2, qy = 640; // 650 px = 55 mm, cabe a etiqueta de 50 mm com folga
+    ctx.save(); ctx.shadowColor = 'rgba(0,0,0,0.18)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 12;
+    ctx.fillStyle = '#fff'; rr(qx - 50, qy - 50, s + 100, s + 100, 48); ctx.fill(); ctx.restore();
+    ctx.strokeStyle = d.cor; ctx.lineWidth = 8; rr(qx - 50, qy - 50, s + 100, s + 100, 48); ctx.stroke();
+    ctx.strokeStyle = '#c9ced6'; ctx.lineWidth = 4; ctx.setLineDash([22, 16]); ctx.strokeRect(qx, qy, s, s); ctx.setLineDash([]);
+    icone(P.camera, W / 2, qy + s / 2 - 30, 110, '#e3e6eb');
+    ctx.font = F(600, 30); ctx.fillStyle = '#b3b9c3'; ctx.fillText('QR CODE AQUI', W / 2, qy + s / 2 + 70);
+    selo(d, W / 2, qy - 50);
+    const passo = (y, path, n, txt) => {
+      ctx.fillStyle = d.cor; ctx.beginPath(); ctx.arc(200, y, 52, 0, Math.PI * 2); ctx.fill();
+      icone(path, 200, y, 56, '#fff');
+      ctx.textAlign = 'left'; ctx.font = F(700, 30); ctx.fillStyle = d.cor; ctx.fillText('PASSO ' + n, 290, y - 14);
+      texto(txt, 290, y + 34, W - 400, 46, 700, '#1c1f26'); ctx.textAlign = 'center';
+    };
+    passo(1440, P.camera, 1, 'Abra a câmera do celular');
+    passo(1570, P.wifi, 2, 'Toque no aviso e conecte');
+    ctx.fillStyle = g; ctx.fillRect(0, H - 90, W, 90);
+    ctx.font = F(700, 34); ctx.fillStyle = '#fff'; ctx.fillText('Wi-Fi grátis para clientes', W / 2, H - 33);
+  }},
+
+  // etiqueta 50x50 mm pra impressora térmica (Phomemo e afins): só preto e branco, sem logo
+  etiqueta: { nome: 'Etiqueta', w: 591, h: 591, draw(d, W, H) {
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+    const s = d.mostra ? 430 : 470, qx = (W - s) / 2;
+    qrDesenho({ ...d, logoQR: false }, qx, 16, s, '#000');
+    ctx.textAlign = 'center';
+    if (d.mostra) {
+      texto(d.ssid, W / 2, s + 66, W - 30, 40, 800, '#000');
+      texto('Senha: ' + d.senha, W / 2, s + 112, W - 30, 36, 700, '#000');
+    } else texto(d.ssid, W / 2, s + 80, W - 30, 44, 800, '#000');
   }}
 };
 
